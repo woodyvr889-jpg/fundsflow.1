@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FundsFlow Hub v1.1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body data-page="hub">
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- HEADER -->
+  <header class="top-header glass">
+    <h1 class="app-title">
+      <span class="gradient-text">FundsFlow</span>
+      <span class="version-tag">v1.1</span>
+    </h1>
+  </header>
+
+  <main class="main-shell">
+
+    <!-- WELCOME -->
+    <section class="card glass" id="sec-welcome">
+      <h2>Welcome to FundsFlow v1.1</h2>
+      <p>You are logged in as:</p>
+      <h3 id="hubWelcomeName"></h3>
+      <button id="btnLogout" class="btn danger" style="margin-top:1rem;">🚪 Logout</button>
+    </section>
+
+    <!-- INTRO -->
+    <section class="card glass">
+      <h2>Welcome to FundsFlow Hub</h2>
+      <p>This is your dashboard for events, points, Shop, Shop+, parcels and profile.</p>
+    </section>
+
+    <!-- EVENTS -->
+    <section class="card glass">
+      <h2>Events</h2>
+      <h3>Most Recent Event</h3>
+      <p>Xmas & New years bid (2025)</p>
+
+      <h3>Live / Current Event</h3>
+      <p>No live event</p>
+
+      <h3>Next Event</h3>
+      <p>TBA</p>
+
+      <h3>Next MAIN Event</h3>
+      <p>TBA</p>
+    </section>
+
+    <!-- MOST RECENT BIDDER -->
+    <section class="card glass">
+      <h2>Most Recent Bidder</h2>
+      <p id="recentBidder"><p>-</p>
+    </section>
+
+    <!-- MOST RECENT TICKET BUYER -->
+    <section class="card glass">
+      <h2>Most Recent Ticket Buyer</h2>
+      <p id="recentTicketBuyer">—</p>
+    </section>
+
+    <!-- GOAL -->
+    <section class="card glass">
+      <h2>Bidding / Raffle Goal</h2>
+      <p id="goalAmount">£0/£0</p>
+      <div class="goal-bar"><div id="goalFill" class="goal-fill"></div></div>
+    </section>
+
+    <!-- NEXT ADMIN ABUSE -->
+    <section class="card glass">
+      <h2>Next Admin Abuse</h2>
+      <p id="nextAdminAbuse">?</p>
+    </section>
+
+    <!-- POINTS -->
+    <section class="card glass">
+      <h2>🏅 Points Leaderboard</h2>
+      <table class="results-table" id="pointsTable">
+        <thead><tr><th>Rank</th><th>Name</th><th>Points</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- NORMAL SHOP -->
+    <section class="card glass" id="sec-shop">
+      <h2>FundsFlow Shop</h2>
+      <p class="muted small">Buy items with points or money.</p>
+      <div id="normalShopItems" class="shop-grid"></div>
+    </section>
+
+    <!-- SHOP+ CLOSED -->
+    <section class="card glass" id="sec-shopplus">
+      <h2>🚨 SHOP+ MAXX EDITION — CURRENTLY CLOSED 🚨</h2>
+      <p class="muted small">Returns soon with limited items</p>
+      <div id="limitedDeals" class="shop-grid"></div>
+      <div id="shopPlusItems" class="shop-grid"></div>
+    </section>
+
+    <!-- EXPRESS -->
+    <section class="card glass">
+      <h2>FundsFlow Express</h2>
+      <table class="results-table">
+        <thead><tr><th>Name</th><th>Item</th><th>Status</th><th>Expected</th></tr></thead>
+        <tbody>
+          <tr><td>Grandad Steve</td><td>Apple Magic</td><td>Pending</td><td>Unknown</td></tr>
+          <tr><td>Uncle Paul</td><td>Big Brother Raffle</td><td>Pending</td><td>Unknown</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- PROFILE -->
+    <section class="card glass">
+      <h2>My Profile</h2>
+      <div class="fields-col">
+        <label>Name</label>
+        <input id="profileName">
+
+        <label>Email</label>
+        <input id="profileEmail">
+
+        <label>Phone</label>
+        <input id="profilePhone">
+      </div>
+    </section>
+
+        <!-- MESSAGE -->
+    <section class="card glass">
+      <h2>A Message from FundsFlow</h2>
+      <p>Merry Christmas! Hope you enjoyed Bidding Funds 2025. 🎄🎅🎁</p>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
