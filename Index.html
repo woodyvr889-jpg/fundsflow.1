@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FundsFlow v100 — Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body data-page="login" class="login-body">
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- HEADER -->
+  <header class="top-header glass compact">
+    <h1 class="app-title">
+      <span class="gradient-text">FundsFlow</span>
+      <span class="version-tag">v100</span>
+    </h1>
+    <p class="header-sub">Select your profile to continue</p>
+  </header>
+
+  <main class="main-shell">
+
+    <!-- PROFILE GRID -->
+    <section class="card glass" id="profilesCard">
+      <h2>Choose your profile</h2>
+      <p class="muted small">Tap a name → enter your keypad code.</p>
+      <div id="loginProfiles" class="user-grid"></div>
+    </section>
+
+    <!-- KEYPAD -->
+    <section id="keypadSection" class="card glass hidden">
+      <h2 id="keypadTitle">Enter code</h2>
+
+      <div id="keypadDisplay" class="keypad-display">----</div>
+
+      <div class="keypad">
+        <button class="key-btn" data-num="1">1</button>
+        <button class="key-btn" data-num="2">2</button>
+        <button class="key-btn" data-num="3">3</button>
+        <button class="key-btn" data-num="4">4</button>
+        <button class="key-btn" data-num="5">5</button>
+        <button class="key-btn" data-num="6">6</button>
+        <button class="key-btn" data-num="7">7</button>
+        <button class="key-btn" data-num="8">8</button>
+        <button class="key-btn" data-num="9">9</button>
+        <button class="key-btn danger" data-action="clear">Clear</button>
+        <button class="key-btn" data-num="0">0</button>
+        <button class="key-btn primary" data-action="enter">Enter</button>
+      </div>
+
+      <p id="loginError" class="muted small"></p>
+
+      <button id="backToProfiles" class="btn ghost full" style="margin-top:.8rem;">⬅ Go Back</button>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
