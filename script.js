@@ -34,9 +34,9 @@ const storage = (() => {
 /* ---------- USERS ---------- */
 const USERS = [
   { name: "James",          code: "080512" },
-  { name: "Mum",            code: "1291"   },
+  { name: "Mum",            code: "2206"   },
   { name: "Dad",    
-code: "5089"   },
+code: "2085"   },
   { name: "Nannan",         code: "4213"   },
   { name: "Grandad Darren", code: "8765"   },
   { name: "Grandma Jean",   code: "1357"   },
