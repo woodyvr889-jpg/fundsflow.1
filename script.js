@@ -603,7 +603,7 @@ function markShopPlusClosed() {
 
 // Everyone ~500k, Uncle Paul slightly higher
 const POINTS_DATA = [
-  { name: "Uncle Paul",     points: 0 },
+  { name: "Uncle Paul",     points: 500 },
   { name: "Grandad Steve",  points: 0 },
   { name: "Mum",            points: 0 },
   { name: "Grandma Jean",   points: 0 },
