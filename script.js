@@ -717,3 +717,88 @@ document.addEventListener("DOMContentLoaded", () => {
   if (page === "login") initLoginPage();
   if (page === "hub")   initHubPage();
 });
+
+/* =========================================================
+   STRANGER GAME SCRIPT
+========================================================= */
+
+/* NAVIGATION */
+function goHub(){location.href="hub.html";}
+function goUpside(){location.href="upsidedown.html";}
+function goShop(){location.href="strangershop.html";}
+function goSpin(){location.href="dailyspin.html";}
+function goBoard(){location.href="leaderboard.html";}
+
+/* DAILY PLAY LOCK */
+const today = new Date().toDateString();
+if(localStorage.getItem("played") === today){
+  const startBtn = document.getElementById("startBtn");
+  if(startBtn) startBtn.style.display="none";
+  const lockMsg = document.getElementById("lockMsg");
+  if(lockMsg) lockMsg.innerText =
+    "Uh-oh! You've already played today. Come back tomorrow!";
+}
+
+/* GAME START */
+function startGame(){
+  localStorage.setItem("played", today);
+  const topNav = document.getElementById("topNav");
+  if(topNav) topNav.style.display="none";
+  const startBtn = document.getElementById("startBtn");
+  if(startBtn) startBtn.style.display="none";
+  startTimer();
+}
+
+/* TIMER */
+let seconds = 180;
+function startTimer(){
+  const t = setInterval(()=>{
+    seconds--;
+    const m = Math.floor(seconds/60);
+    const s = seconds%60;
+    const timeEl = document.getElementById("time");
+    if(timeEl) timeEl.innerText =
+      m + ":" + (s<10?"0":"") + s;
+    if(seconds<=0) clearInterval(t);
+  },1000);
+}
+
+/* PLAYER MOVEMENT */
+const player = document.getElementById("player");
+const walls = document.querySelectorAll(".wall");
+const gameArea = document.getElementById("gameArea");
+
+let px = 30, py = 30;
+const speed = 6;
+
+document.addEventListener("keydown", e=>{
+  if(!player) return;
+  let nx = px, ny = py;
+  if(e.key==="ArrowUp"||e.key==="w") ny -= speed;
+  if(e.key==="ArrowDown"||e.key==="s") ny += speed;
+  if(e.key==="ArrowLeft"||e.key==="a") nx -= speed;
+  if(e.key==="ArrowRight"||e.key==="d") nx += speed;
+
+  if(!hitsWall(nx,ny)){
+    px = nx; py = ny;
+    player.style.left = px+"px";
+    player.style.top = py+"px";
+  }
+});
+
+function hitsWall(x,y){
+  if(!walls || walls.length===0 || !gameArea) return false;
+  const pr = {l:x,t:y,r:x+26,b:y+26};
+  const gr = gameArea.getBoundingClientRect();
+  for(const w of walls){
+    const wr = w.getBoundingClientRect();
+    const r = {
+      l:wr.left-gr.left,
+      t:wr.top-gr.top,
+      r:wr.right-gr.left,
+      b:wr.bottom-gr.top
+    };
+    if(pr.r>r.l && pr.l<r.r && pr.b>r.t && pr.t<r.b) return true;
+  }
+  return false;
+}
