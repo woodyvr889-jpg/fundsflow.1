@@ -2,201 +2,201 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Stranger Things Game</title>
+<title>Stranger Game</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body {
-  margin: 0;
-  background: #000010;
-  color: red;
-  font-family: 'ITC Benguiat', serif;
+body{
+  margin:0;
+  background:#000010;
+  color:#b30000;
+  font-family:'ITC Benguiat',serif;
+  text-align:center;
 }
 
-header {
-  text-align: center;
-  padding: 15px;
-  border-bottom: 2px solid red;
+/* HEADER */
+header{
+  padding:12px;
+  font-size:2rem;
 }
 
-nav button {
-  margin: 5px;
-  padding: 8px 14px;
-  background: #300;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: bold;
+/* BUTTONS */
+.nav{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+.btn{
+  padding:8px 14px;
+  border:none;
+  border-radius:10px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.primary{background:#006400;color:white;}
+.secondary{background:#550000;color:white;}
+
+/* GAME AREA */
+#gameArea{
+  position:relative;
+  width:360px;
+  height:360px;
+  margin:15px auto;
+  background:#000;
+  border:3px solid #550000;
+  overflow:hidden;
 }
 
-nav button:hover {
-  background: red;
+/* PLAYER */
+#player{
+  position:absolute;
+  font-size:26px;
+  left:30px;
+  top:30px;
+  z-index:5;
 }
 
-#stats {
-  display: flex;
-  justify-content: space-around;
-  padding: 10px;
-  border-bottom: 1px solid red;
+/* WALLS */
+.wall{
+  position:absolute;
+  background:linear-gradient(180deg,#2b0000,#000);
+  box-shadow:0 0 8px #550000;
 }
 
-#howTo {
-  padding: 15px;
-  text-align: center;
-}
-
-#gameArea {
-  position: relative;
-  width: 90%;
-  max-width: 600px;
-  height: 400px;
-  margin: 20px auto;
-  background: radial-gradient(circle, #120015, #000);
-  border: 3px solid darkred;
-  overflow: hidden;
-}
-
-.item {
-  position: absolute;
-  font-size: 24px;
-  cursor: pointer;
-  animation: float 2s infinite alternate;
-}
-
-@keyframes float {
-  from { transform: translateY(0); }
-  to { transform: translateY(-8px); }
-}
-
-#controls {
-  text-align: center;
-  margin: 20px;
-}
-
-#timer {
-  font-size: 1.4rem;
-  margin-top: 10px;
-}
-
-.hidden {
-  display: none;
+/* INFO */
+.section{
+  margin:12px;
+  font-size:1rem;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <h1>Stranger Things: The Upside Down Game</h1>
-  <nav id="navBar">
-    <button onclick="goHub()">Hub</button>
-    <button onclick="goUpside()">Upside Down</button>
-    <button onclick="goShop()">Stranger Shop</button>
-    <button onclick="goSpin()">Daily Spin</button>
-    <button onclick="goBoard()">Leaderboard</button>
-  </nav>
-</header>
+<header>STRANGER GAME</header>
 
-<section id="stats">
-  <div>🪙 Coins: <span id="coins">0</span></div>
-  <div>⭐ XP: <span id="xp">0</span></div>
-  <div>🏆 Points: <span id="points">0</span></div>
-</section>
+<div class="nav" id="topNav">
+  <button class="btn secondary" onclick="goHub()">Back to Hub</button>
+  <button class="btn secondary" onclick="goUpside()">The Upside Down</button>
+  <button class="btn secondary" onclick="goShop()">Stranger Shop</button>
+  <button class="btn secondary" onclick="goSpin()">Daily Spin</button>
+  <button class="btn secondary" onclick="goBoard()">Leaderboard</button>
+</div>
 
-<section id="howTo">
-  <p>Collect 🪙 coins, ⬆️ XP boosts and 🕓 time bonuses.</p>
-  <p>Avoid 💣 bombs — they explode!</p>
-</section>
+<div class="section" id="userStats">
+  🪙 Coins: <span id="coins">0</span> |
+  ⭐ Points: <span id="points">0</span> |
+  ⚡ XP: <span id="xp">0</span>
+</div>
 
-<div id="gameArea"></div>
+<div class="section">
+  <strong>How to Play</strong><br>
+  Move with arrow keys / WASD.<br>
+  Collect 🪙 ⬆️ 🕓 — avoid 💣
+</div>
 
-<div id="controls">
-  <button id="startBtn" onclick="startGame()">START GAME</button>
-  <div id="timer"></div>
+<div class="section">
+  Time Left: <span id="time">3:00</span>
+</div>
+
+<!-- GAME -->
+<div id="gameArea">
+
+  <!-- PLAYER -->
+  <div id="player">🟡</div>
+
+  <!-- WALLS -->
+  <div class="wall" style="top:0; left:0; width:100%; height:16px;"></div>
+  <div class="wall" style="bottom:0; left:0; width:100%; height:16px;"></div>
+  <div class="wall" style="top:0; left:0; width:16px; height:100%;"></div>
+  <div class="wall" style="top:0; right:0; width:16px; height:100%;"></div>
+
+  <div class="wall" style="top:90px; left:60px; width:260px; height:14px;"></div>
+  <div class="wall" style="top:180px; left:200px; width:14px; height:120px;"></div>
+  <div class="wall" style="top:260px; left:40px; width:220px; height:14px;"></div>
+
+</div>
+
+<div class="section">
+  <button class="btn primary" id="startBtn" onclick="startGame()">▶ Start Game</button>
   <div id="lockMsg"></div>
 </div>
 
 <script>
+/* NAV */
+function goHub(){location.href="hub.html";}
+function goUpside(){location.href="upsidedown.html";}
+function goShop(){location.href="strangershop.html";}
+function goSpin(){location.href="dailyspin.html";}
+function goBoard(){location.href="leaderboard.html";}
+
+/* DAILY LOCK */
+const today = new Date().toDateString();
+if(localStorage.getItem("played") === today){
+  document.getElementById("startBtn").style.display="none";
+  document.getElementById("lockMsg").innerText =
+    "Uh-oh! You've already played today. Come back tomorrow!";
+}
+
+/* GAME START */
+function startGame(){
+  localStorage.setItem("played", today);
+  document.getElementById("topNav").style.display="none";
+  document.getElementById("startBtn").style.display="none";
+  startTimer();
+}
+
+/* TIMER */
+let seconds = 180;
+function startTimer(){
+  const t = setInterval(()=>{
+    seconds--;
+    const m = Math.floor(seconds/60);
+    const s = seconds%60;
+    document.getElementById("time").innerText =
+      m + ":" + (s<10?"0":"") + s;
+    if(seconds<=0) clearInterval(t);
+  },1000);
+}
+
+/* PLAYER MOVEMENT */
+const player = document.getElementById("player");
+const walls = document.querySelectorAll(".wall");
 const gameArea = document.getElementById("gameArea");
-const startBtn = document.getElementById("startBtn");
-const timerEl = document.getElementById("timer");
-const lockMsg = document.getElementById("lockMsg");
-const navBar = document.getElementById("navBar");
 
-let coins = 0, xp = 0, points = 0;
-let timeLeft = 180;
-let gameInterval, spawnInterval;
+let px = 30, py = 30;
+const speed = 6;
 
-// -------- NAV --------
-function goHub(){ location.href="hub.html"; }
-function goUpside(){ location.href="upsidedown.html"; }
-function goShop(){ location.href="strangershop.html"; }
-function goSpin(){ location.href="dailyspin.html"; }
-function goBoard(){ location.href="leaderboard.html"; }
+document.addEventListener("keydown", e=>{
+  let nx = px, ny = py;
+  if(e.key==="ArrowUp"||e.key==="w") ny -= speed;
+  if(e.key==="ArrowDown"||e.key==="s") ny += speed;
+  if(e.key==="ArrowLeft"||e.key==="a") nx -= speed;
+  if(e.key==="ArrowRight"||e.key==="d") nx += speed;
 
-// -------- DAILY LOCK --------
-const today = new Date().toISOString().split("T")[0];
-if (localStorage.getItem("playedDate") === today) {
-  startBtn.classList.add("hidden");
-  lockMsg.innerHTML = "Uh-oh! You've already played today. Come back tomorrow.";
-}
-
-// -------- GAME START --------
-function startGame() {
-  localStorage.setItem("playedDate", today);
-  startBtn.classList.add("hidden");
-  navBar.classList.add("hidden");
-
-  gameInterval = setInterval(updateTimer, 1000);
-  spawnInterval = setInterval(spawnItem, 800);
-}
-
-// -------- TIMER --------
-function updateTimer() {
-  timeLeft--;
-  timerEl.textContent = "⏱️ Time Left: " + timeLeft + "s";
-
-  if (timeLeft <= 0) endGame();
-}
-
-// -------- SPAWN ITEMS --------
-function spawnItem() {
-  const items = ["🪙","⬆️","🕓","💣"];
-  const item = document.createElement("div");
-  item.className = "item";
-  item.textContent = items[Math.floor(Math.random()*items.length)];
-
-  item.style.left = Math.random() * (gameArea.clientWidth - 30) + "px";
-  item.style.top = Math.random() * (gameArea.clientHeight - 30) + "px";
-
-  item.onclick = () => collectItem(item.textContent, item);
-  gameArea.appendChild(item);
-
-  setTimeout(() => item.remove(), 3000);
-}
-
-// -------- COLLECT --------
-function collectItem(type, el) {
-  if (type === "🪙") coins += 10;
-  if (type === "⬆️") xp += 5;
-  if (type === "🕓") timeLeft += 5;
-  if (type === "💣") {
-    el.textContent = "💥";
-    timeLeft -= 10;
+  if(!hitsWall(nx,ny)){
+    px = nx; py = ny;
+    player.style.left = px+"px";
+    player.style.top = py+"px";
   }
+});
 
-  document.getElementById("coins").textContent = coins;
-  document.getElementById("xp").textContent = xp;
-  document.getElementById("points").textContent = points;
-  el.remove();
-}
-
-// -------- END GAME --------
-function endGame() {
-  clearInterval(gameInterval);
-  clearInterval(spawnInterval);
-  timerEl.textContent = "GAME OVER";
+function hitsWall(x,y){
+  const pr = {l:x,t:y,r:x+26,b:y+26};
+  for(const w of walls){
+    const wr = w.getBoundingClientRect();
+    const gr = gameArea.getBoundingClientRect();
+    const r = {
+      l:wr.left-gr.left,
+      t:wr.top-gr.top,
+      r:wr.right-gr.left,
+      b:wr.bottom-gr.top
+    };
+    if(pr.r>r.l && pr.l<r.r && pr.b>r.t && pr.t<r.b) return true;
+  }
+  return false;
 }
 </script>
 
