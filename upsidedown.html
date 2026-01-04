@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Upside Down</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{margin:0;padding:0;background:#000010;color:blue;font-family:'ITC Benguiat',serif;font-weight:bold;text-align:center;display:flex;justify-content:center;align-items:center;height:100vh;overflow:hidden;}
+#flickerText{font-size:2.5rem;animation:flicker 1s infinite;}
+#backBtn{position:fixed;top:20px;left:20px;padding:0.5rem 1rem;font-size:1rem;font-weight:bold;background:#550000;color:#fff;border:none;border-radius:12px;cursor:pointer;z-index:1000;}
+#backBtn:hover{background:#ff0000;}
+@keyframes flicker{0%,19%,21%,23%,25%,54%,56%,100%{color:blue;}20%,24%,55%{color:red;}22%,26%{color:white;}}
+</style>
+</head>
+<body>
+<button id="backBtn" onclick="goBack()">← Back to Hub</button>
+
+<div id="flickerText">
+THE UPSIDE DOWN IS WATCHING...<br>
+WORLDS ARE COLLIDING...<br>
+ELEVEN SENSES THE CHAOS...<br>
+CONTROLLED BY VECNA, THE FIRST: HENRY CREEL, 001, MR. WHATSIT...
+BEWARE. BEWARE! BEWARE!!!
+RUN. RUN! RUN! YOU NEED TO RUNNNN!!!!!
+</div>
+
+<script>
+function goBack(){window.location.href="hub.html";}
+</script>
+</body>
+</html>
