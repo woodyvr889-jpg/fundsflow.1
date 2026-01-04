@@ -38,6 +38,24 @@ body{
 }
 
 /* =========================================================
+   🩸 STRANGER THINGS FONT + THEME
+========================================================= */
+
+@font-face {
+  font-family: 'ITC Benguiat';
+  src: url('fonts/ITCBenguiat.woff2') format('woff2'),
+       url('fonts/ITCBenguiat.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+h1, h2, .app-title, .user-name {
+  font-family: 'ITC Benguiat', serif;
+  color: #e50914; /* Stranger Things red */
+  text-shadow: 0 0 10px #e50914, 0 0 20px #e50914;
+}
+
+/* =========================================================
    🎄 MOBILE SAFE DECORATIONS (NO PAGE SCALING)
 ========================================================= */
 
