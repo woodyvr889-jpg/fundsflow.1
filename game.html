@@ -2,244 +2,201 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Stranger Things Bid Game — Maze Edition</title>
+<title>Stranger Things Game</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-@font-face {
-  font-family: 'ITC Benguiat';
-  src: url('fonts/ITCBenguiat.woff2') format('woff2'),
-       url('fonts/ITCBenguiat.woff') format('woff');
-}
-
 body {
-  margin:0;
-  padding:0;
-  background:#0b0b20;
-  font-family:'ITC Benguiat', serif;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  overflow:hidden;
-  color:#e50914;
+  margin: 0;
+  background: #000010;
+  color: red;
+  font-family: 'ITC Benguiat', serif;
 }
 
-#score-board {
-  position:absolute;
-  top:10px;
-  font-size:1.3rem;
-  text-shadow:0 0 5px red;
+header {
+  text-align: center;
+  padding: 15px;
+  border-bottom: 2px solid red;
 }
 
-#game-container {
-  display:grid;
-  grid-template-columns:repeat(20,30px);
-  grid-template-rows:repeat(20,30px);
-  gap:1px;
-  width:600px;
-  height:600px;
-  background:#05050f;
-  border:3px solid #e50914;
+nav button {
+  margin: 5px;
+  padding: 8px 14px;
+  background: #300;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
-.cell {
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:1.2rem;
+nav button:hover {
+  background: red;
 }
 
-.wall {
-  background:linear-gradient(135deg,#0b0010,#220022);
-  box-shadow:0 0 10px #440044 inset;
+#stats {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  border-bottom: 1px solid red;
 }
 
-.collectible {
-  animation:glow 1s infinite alternate;
+#howTo {
+  padding: 15px;
+  text-align: center;
 }
 
-@keyframes glow {
-  from { text-shadow:0 0 5px white; }
-  to { text-shadow:0 0 15px red; }
+#gameArea {
+  position: relative;
+  width: 90%;
+  max-width: 600px;
+  height: 400px;
+  margin: 20px auto;
+  background: radial-gradient(circle, #120015, #000);
+  border: 3px solid darkred;
+  overflow: hidden;
 }
 
-.player {
-  font-size:1.4rem;
-  text-shadow:0 0 10px cyan;
+.item {
+  position: absolute;
+  font-size: 24px;
+  cursor: pointer;
+  animation: float 2s infinite alternate;
 }
 
-.bomb {
-  animation:pulse 0.8s infinite alternate;
+@keyframes float {
+  from { transform: translateY(0); }
+  to { transform: translateY(-8px); }
 }
 
-@keyframes pulse {
-  from { transform:scale(1); }
-  to { transform:scale(1.3); }
+#controls {
+  text-align: center;
+  margin: 20px;
+}
+
+#timer {
+  font-size: 1.4rem;
+  margin-top: 10px;
+}
+
+.hidden {
+  display: none;
 }
 </style>
 </head>
 
 <body>
 
-<div id="score-board">Score: 0</div>
-<div id="game-container"></div>
+<header>
+  <h1>Stranger Things: The Upside Down Game</h1>
+  <nav id="navBar">
+    <button onclick="goHub()">Hub</button>
+    <button onclick="goUpside()">Upside Down</button>
+    <button onclick="goShop()">Stranger Shop</button>
+    <button onclick="goSpin()">Daily Spin</button>
+    <button onclick="goBoard()">Leaderboard</button>
+  </nav>
+</header>
+
+<section id="stats">
+  <div>🪙 Coins: <span id="coins">0</span></div>
+  <div>⭐ XP: <span id="xp">0</span></div>
+  <div>🏆 Points: <span id="points">0</span></div>
+</section>
+
+<section id="howTo">
+  <p>Collect 🪙 coins, ⬆️ XP boosts and 🕓 time bonuses.</p>
+  <p>Avoid 💣 bombs — they explode!</p>
+</section>
+
+<div id="gameArea"></div>
+
+<div id="controls">
+  <button id="startBtn" onclick="startGame()">START GAME</button>
+  <div id="timer"></div>
+  <div id="lockMsg"></div>
+</div>
 
 <script>
-// ==============================
-// BASIC SETUP
-// ==============================
-const container = document.getElementById("game-container");
-const rows = 20;
-const cols = 20;
-let score = 0;
-let playerPos = { x:1, y:1 };
+const gameArea = document.getElementById("gameArea");
+const startBtn = document.getElementById("startBtn");
+const timerEl = document.getElementById("timer");
+const lockMsg = document.getElementById("lockMsg");
+const navBar = document.getElementById("navBar");
 
-// ==============================
-// MAZE (0 = path, 1 = wall)
-// ==============================
-const maze = [
-[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-[1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
-[1,0,1,0,1,0,1,1,1,0,1,0,1,1,1,0,1,0,0,1],
-[1,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,1,0,0,1],
-[1,0,1,1,1,1,0,0,1,1,1,1,0,0,1,0,1,1,0,1],
-[1,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,1,0,1],
-[1,1,1,1,0,1,1,1,1,0,1,1,1,0,1,1,0,1,0,1],
-[1,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,0,0,1],
-[1,0,1,1,1,1,1,0,1,1,1,0,1,1,0,1,1,1,0,1],
-[1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1],
-[1,1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,0,1],
-[1,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,1,0,1],
-[1,0,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1,0,1],
-[1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,1],
-[1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1,1],
-[1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,1],
-[1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
-[1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1],
-[1,0,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,0,1],
-[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-];
+let coins = 0, xp = 0, points = 0;
+let timeLeft = 180;
+let gameInterval, spawnInterval;
 
-// ==============================
-// GRID GENERATION
-// ==============================
-const grid = [];
-for(let y=0;y<rows;y++){
-  const row=[];
-  for(let x=0;x<cols;x++){
-    const cell=document.createElement("div");
-    cell.classList.add("cell");
-    if(maze[y][x]===1) cell.classList.add("wall");
-    container.appendChild(cell);
-    row.push(cell);
-  }
-  grid.push(row);
+// -------- NAV --------
+function goHub(){ location.href="hub.html"; }
+function goUpside(){ location.href="upsidedown.html"; }
+function goShop(){ location.href="strangershop.html"; }
+function goSpin(){ location.href="dailyspin.html"; }
+function goBoard(){ location.href="leaderboard.html"; }
+
+// -------- DAILY LOCK --------
+const today = new Date().toISOString().split("T")[0];
+if (localStorage.getItem("playedDate") === today) {
+  startBtn.classList.add("hidden");
+  lockMsg.innerHTML = "Uh-oh! You've already played today. Come back tomorrow.";
 }
 
-// ==============================
-// SPAWNING
-// ==============================
-const collectibles=["🪙","⬆️","🕓"];
-const bombs=[];
+// -------- GAME START --------
+function startGame() {
+  localStorage.setItem("playedDate", today);
+  startBtn.classList.add("hidden");
+  navBar.classList.add("hidden");
 
-function randomEmptyCell(){
-  let x,y;
-  do{
-    x=Math.floor(Math.random()*cols);
-    y=Math.floor(Math.random()*rows);
-  }while(maze[y][x]===1 || grid[y][x].textContent);
-  return {x,y};
+  gameInterval = setInterval(updateTimer, 1000);
+  spawnInterval = setInterval(spawnItem, 800);
 }
 
-function spawnCollectible(){
-  const p=randomEmptyCell();
-  const c=grid[p.y][p.x];
-  c.textContent=collectibles[Math.floor(Math.random()*collectibles.length)];
-  c.classList.add("collectible");
+// -------- TIMER --------
+function updateTimer() {
+  timeLeft--;
+  timerEl.textContent = "⏱️ Time Left: " + timeLeft + "s";
+
+  if (timeLeft <= 0) endGame();
 }
 
-function spawnBomb(){
-  const p=randomEmptyCell();
-  const c=grid[p.y][p.x];
-  c.textContent="💣";
-  c.classList.add("bomb");
-  bombs.push({x:p.x,y:p.y,timer:3});
+// -------- SPAWN ITEMS --------
+function spawnItem() {
+  const items = ["🪙","⬆️","🕓","💣"];
+  const item = document.createElement("div");
+  item.className = "item";
+  item.textContent = items[Math.floor(Math.random()*items.length)];
+
+  item.style.left = Math.random() * (gameArea.clientWidth - 30) + "px";
+  item.style.top = Math.random() * (gameArea.clientHeight - 30) + "px";
+
+  item.onclick = () => collectItem(item.textContent, item);
+  gameArea.appendChild(item);
+
+  setTimeout(() => item.remove(), 3000);
 }
 
-for(let i=0;i<20;i++) spawnCollectible();
-setInterval(spawnCollectible,6000);
-setInterval(spawnBomb,9000);
-
-// ==============================
-// PLAYER
-// ==============================
-function renderPlayer(){
-  grid.flat().forEach(cell=>{
-    if(!cell.classList.contains("wall") &&
-       !cell.classList.contains("collectible") &&
-       !cell.classList.contains("bomb")){
-      cell.textContent="";
-    }
-  });
-  grid[playerPos.y][playerPos.x].textContent="😎";
-  grid[playerPos.y][playerPos.x].classList.add("player");
-}
-renderPlayer();
-
-// ==============================
-// MOVEMENT
-// ==============================
-document.addEventListener("keydown",e=>{
-  let nx=playerPos.x;
-  let ny=playerPos.y;
-  if(e.key==="ArrowUp") ny--;
-  if(e.key==="ArrowDown") ny++;
-  if(e.key==="ArrowLeft") nx--;
-  if(e.key==="ArrowRight") nx++;
-
-  if(nx<0||ny<0||nx>=cols||ny>=rows) return;
-  if(maze[ny][nx]===1) return;
-
-  const target=grid[ny][nx];
-
-  if(target.classList.contains("collectible")){
-    score+=100;
-    target.classList.remove("collectible");
+// -------- COLLECT --------
+function collectItem(type, el) {
+  if (type === "🪙") coins += 10;
+  if (type === "⬆️") xp += 5;
+  if (type === "🕓") timeLeft += 5;
+  if (type === "💣") {
+    el.textContent = "💥";
+    timeLeft -= 10;
   }
 
-  if(target.classList.contains("bomb")){
-    alert("💥 BOOM! Game Over!");
-    location.reload();
-  }
+  document.getElementById("coins").textContent = coins;
+  document.getElementById("xp").textContent = xp;
+  document.getElementById("points").textContent = points;
+  el.remove();
+}
 
-  playerPos={x:nx,y:ny};
-  renderPlayer();
-  document.getElementById("score-board").textContent="Score: "+score;
-});
-
-// ==============================
-// BOMB TIMER
-// ==============================
-setInterval(()=>{
-  for(let i=bombs.length-1;i>=0;i--){
-    bombs[i].timer--;
-    if(bombs[i].timer<=0){
-      const b=bombs[i];
-      const c=grid[b.y][b.x];
-      c.textContent="💥";
-      c.classList.remove("bomb");
-      bombs.splice(i,1);
-      setTimeout(()=>c.textContent="",500);
-    }
-  }
-},1000);
-
-// ==============================
-// NAVIGATION
-// ==============================
-function goHub(){
-  window.location.href="hub.html";
+// -------- END GAME --------
+function endGame() {
+  clearInterval(gameInterval);
+  clearInterval(spawnInterval);
+  timerEl.textContent = "GAME OVER";
 }
 </script>
 
