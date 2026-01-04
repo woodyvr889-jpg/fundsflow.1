@@ -4,13 +4,12 @@
 <meta charset="UTF-8">
 <title>Stranger Things Bid Game — Maze Edition</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
 @font-face {
   font-family: 'ITC Benguiat';
   src: url('fonts/ITCBenguiat.woff2') format('woff2'),
        url('fonts/ITCBenguiat.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
 }
 
 body {
@@ -28,83 +27,76 @@ body {
 
 #score-board {
   position:absolute;
-  top:-50px;
+  top:10px;
   font-size:1.3rem;
-  text-shadow: 0 0 5px #ff0000;
+  text-shadow:0 0 5px red;
 }
 
 #game-container {
-  display: grid;
-  grid-template-columns: repeat(20, 30px);
-  grid-template-rows: repeat(20, 30px);
+  display:grid;
+  grid-template-columns:repeat(20,30px);
+  grid-template-rows:repeat(20,30px);
   gap:1px;
-  position:relative;
-  width: 600px;
-  height: 600px;
+  width:600px;
+  height:600px;
   background:#05050f;
-  border: 3px solid #e50914;
+  border:3px solid #e50914;
 }
 
 .cell {
-  width:100%;
-  height:100%;
   display:flex;
   justify-content:center;
   align-items:center;
   font-size:1.2rem;
-  transition: all 0.2s;
 }
 
 .wall {
-  background: linear-gradient(135deg, #0b0010 0%, #220022 100%);
-  box-shadow: 0 0 10px #440044 inset, 0 0 15px #880088 inset;
+  background:linear-gradient(135deg,#0b0010,#220022);
+  box-shadow:0 0 10px #440044 inset;
 }
 
 .collectible {
-  animation: glow 1s infinite alternate;
+  animation:glow 1s infinite alternate;
 }
 
 @keyframes glow {
-  0% { text-shadow:0 0 5px #fff; }
-  50% { text-shadow:0 0 10px #e50914, 0 0 15px #ff0000; }
-  100% { text-shadow:0 0 5px #fff; }
+  from { text-shadow:0 0 5px white; }
+  to { text-shadow:0 0 15px red; }
 }
 
 .player {
   font-size:1.4rem;
-  color:#00ffff;
-  text-shadow: 0 0 10px #00ffff;
+  text-shadow:0 0 10px cyan;
 }
 
 .bomb {
-  font-size:1.3rem;
-  color:#ff4500;
-  animation: pulse 0.8s infinite alternate;
+  animation:pulse 0.8s infinite alternate;
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.3); }
-  100% { transform: scale(1); }
+  from { transform:scale(1); }
+  to { transform:scale(1.3); }
 }
 </style>
 </head>
+
 <body>
 
 <div id="score-board">Score: 0</div>
 <div id="game-container"></div>
 
 <script>
-const container = document.getElementById('game-container');
+// ==============================
+// BASIC SETUP
+// ==============================
+const container = document.getElementById("game-container");
 const rows = 20;
 const cols = 20;
-
-let playerPos = {x:1, y:1};
 let score = 0;
+let playerPos = { x:1, y:1 };
 
 // ==============================
-// MAZE LAYOUT
-// 0 = empty, 1 = wall
+// MAZE (0 = path, 1 = wall)
 // ==============================
 const maze = [
 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -126,19 +118,19 @@ const maze = [
 [1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
 [1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1],
 [1,0,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,0,1],
-[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ];
 
 // ==============================
-// GENERATE GRID
+// GRID GENERATION
 // ==============================
 const grid = [];
-for(let y=0; y<rows; y++){
+for(let y=0;y<rows;y++){
   const row=[];
-  for(let x=0; x<cols; x++){
-    const cell = document.createElement('div');
-    cell.classList.add('cell');
-    if(maze[y][x]===1) cell.classList.add('wall');
+  for(let x=0;x<cols;x++){
+    const cell=document.createElement("div");
+    cell.classList.add("cell");
+    if(maze[y][x]===1) cell.classList.add("wall");
     container.appendChild(cell);
     row.push(cell);
   }
@@ -146,87 +138,84 @@ for(let y=0; y<rows; y++){
 }
 
 // ==============================
-// SPAWN COLLECTIBLES
+// SPAWNING
 // ==============================
-const collectibles = ['🪙','⬆️','🕓'];
-const bombs = [];
+const collectibles=["🪙","⬆️","🕓"];
+const bombs=[];
+
+function randomEmptyCell(){
+  let x,y;
+  do{
+    x=Math.floor(Math.random()*cols);
+    y=Math.floor(Math.random()*rows);
+  }while(maze[y][x]===1 || grid[y][x].textContent);
+  return {x,y};
+}
 
 function spawnCollectible(){
-  let pos;
-  do{
-    pos={x: Math.floor(Math.random()*cols), y: Math.floor(Math.random()*rows)};
-  }while(maze[pos.y][pos.x]===1 || grid[pos.y][pos.x].textContent); // avoid walls & existing items
-  const cell = grid[pos.y][pos.x];
-  const emoji = collectibles[Math.floor(Math.random()*collectibles.length)];
-  cell.textContent = emoji;
-  cell.classList.add('collectible');
+  const p=randomEmptyCell();
+  const c=grid[p.y][p.x];
+  c.textContent=collectibles[Math.floor(Math.random()*collectibles.length)];
+  c.classList.add("collectible");
 }
 
 function spawnBomb(){
-  let pos;
-  do{
-    pos={x: Math.floor(Math.random()*cols), y: Math.floor(Math.random()*rows)};
-  }while(maze[pos.y][pos.x]===1 || grid[pos.y][pos.x].textContent);
-  const cell = grid[pos.y][pos.x];
-  cell.textContent='💣';
-  cell.classList.add('bomb');
-  bombs.push({x: pos.x, y: pos.y, timer:3});
+  const p=randomEmptyCell();
+  const c=grid[p.y][p.x];
+  c.textContent="💣";
+  c.classList.add("bomb");
+  bombs.push({x:p.x,y:p.y,timer:3});
 }
 
-// Initial spawn
 for(let i=0;i<20;i++) spawnCollectible();
-setInterval(spawnCollectible, 6000);
-setInterval(spawnBomb, 9000);
+setInterval(spawnCollectible,6000);
+setInterval(spawnBomb,9000);
 
 // ==============================
 // PLAYER
 // ==============================
 function renderPlayer(){
-  grid.flat().forEach(c=>{
-    if(!c.classList.contains('bomb') && !c.classList.contains('collectible') && !c.classList.contains('wall')) c.textContent='';
+  grid.flat().forEach(cell=>{
+    if(!cell.classList.contains("wall") &&
+       !cell.classList.contains("collectible") &&
+       !cell.classList.contains("bomb")){
+      cell.textContent="";
+    }
   });
-  grid[playerPos.y][playerPos.x].textContent='😎';
-  grid[playerPos.y][playerPos.x].classList.add('player');
+  grid[playerPos.y][playerPos.x].textContent="😎";
+  grid[playerPos.y][playerPos.x].classList.add("player");
 }
 renderPlayer();
 
 // ==============================
 // MOVEMENT
 // ==============================
-document.addEventListener('keydown', e=>{
-  let newX=playerPos.x;
-  let newY=playerPos.y;
-  if(e.key==='ArrowUp') newY--;
-  if(e.key==='ArrowDown') newY++;
-  if(e.key==='ArrowLeft') newX--;
-  if(e.key==='ArrowRight') newX++;
+document.addEventListener("keydown",e=>{
+  let nx=playerPos.x;
+  let ny=playerPos.y;
+  if(e.key==="ArrowUp") ny--;
+  if(e.key==="ArrowDown") ny++;
+  if(e.key==="ArrowLeft") nx--;
+  if(e.key==="ArrowRight") nx++;
 
-  // Boundaries & walls
-  if(newX<0||newX>=cols||newY<0||newY>=rows) return;
-  if(maze[newY][newX]===1) return;
+  if(nx<0||ny<0||nx>=cols||ny>=rows) return;
+  if(maze[ny][nx]===1) return;
 
-  const targetCell = grid[newY][newX];
+  const target=grid[ny][nx];
 
-  // Collectibles
-  if(targetCell.classList.contains('collectible')){
+  if(target.classList.contains("collectible")){
     score+=100;
-    targetCell.classList.remove('collectible');
+    target.classList.remove("collectible");
   }
 
-  // Bombs
-  if(targetCell.classList.contains('bomb')){
-    alert('💥 Boom! Game over!');
-    score=0;
-    bombs.forEach(b=>grid[b.y][b.x].textContent='');
-    bombs.length=0;
-    playerPos={x:1,y:1};
-  }else{
-    playerPos.x=newX;
-    playerPos.y=newY;
+  if(target.classList.contains("bomb")){
+    alert("💥 BOOM! Game Over!");
+    location.reload();
   }
 
+  playerPos={x:nx,y:ny};
   renderPlayer();
-  document.getElementById('score-board').textContent='Score: '+score;
+  document.getElementById("score-board").textContent="Score: "+score;
 });
 
 // ==============================
@@ -236,15 +225,23 @@ setInterval(()=>{
   for(let i=bombs.length-1;i>=0;i--){
     bombs[i].timer--;
     if(bombs[i].timer<=0){
-      const b = bombs[i];
-      const cell = grid[b.y][b.x];
-      cell.textContent='💥';
-      cell.classList.remove('bomb');
+      const b=bombs[i];
+      const c=grid[b.y][b.x];
+      c.textContent="💥";
+      c.classList.remove("bomb");
       bombs.splice(i,1);
-      setTimeout(()=>{ cell.textContent=''; }, 500);
+      setTimeout(()=>c.textContent="",500);
     }
   }
 },1000);
+
+// ==============================
+// NAVIGATION
+// ==============================
+function goHub(){
+  window.location.href="hub.html";
+}
 </script>
+
 </body>
 </html>
