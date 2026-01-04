@@ -1,204 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Stranger Game</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<style>
-body{
-  margin:0;
-  background:#000010;
-  color:#b30000;
-  font-family:'ITC Benguiat',serif;
-  text-align:center;
-}
-
-/* HEADER */
-header{
-  padding:12px;
-  font-size:2rem;
-}
-
-/* BUTTONS */
-.nav{
-  display:flex;
-  gap:8px;
-  justify-content:center;
-  flex-wrap:wrap;
-  margin-bottom:10px;
-}
-.btn{
-  padding:8px 14px;
-  border:none;
-  border-radius:10px;
-  font-weight:bold;
-  cursor:pointer;
-}
-.primary{background:#006400;color:white;}
-.secondary{background:#550000;color:white;}
-
-/* GAME AREA */
-#gameArea{
-  position:relative;
-  width:360px;
-  height:360px;
-  margin:15px auto;
-  background:#000;
-  border:3px solid #550000;
-  overflow:hidden;
-}
-
-/* PLAYER */
-#player{
-  position:absolute;
-  font-size:26px;
-  left:30px;
-  top:30px;
-  z-index:5;
-}
-
-/* WALLS */
-.wall{
-  position:absolute;
-  background:linear-gradient(180deg,#2b0000,#000);
-  box-shadow:0 0 8px #550000;
-}
-
-/* INFO */
-.section{
-  margin:12px;
-  font-size:1rem;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Stranger Game</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+<body data-theme-mode="christmas">
+  <div class="top-header">
+    <h1>STRANGER GAME</h1>
+  </div>
 
-<body>
+  <div class="main-shell">
+    <div class="card" style="text-align:center;">
+      <p>Use Arrow Keys to move!</p>
+      <p>Collect all ⚡ to win before time runs out!</p>
+      <div id="score">Score: 0</div>
+      <div id="timer">Time: 60s</div>
+    </div>
 
-<header>STRANGER GAME</header>
+    <div class="card" style="position:relative; height:400px; background: #020617; overflow:hidden;">
+      <div id="player" style="width:40px; height:40px; background:red; position:absolute; top:180px; left:180px; border-radius:10px; box-shadow:0 0 10px red;"></div>
+    </div>
+  </div>
 
-<div class="nav" id="topNav">
-  <button class="btn secondary" onclick="goHub()">Back to Hub</button>
-  <button class="btn secondary" onclick="goUpside()">The Upside Down</button>
-  <button class="btn secondary" onclick="goShop()">Stranger Shop</button>
-  <button class="btn secondary" onclick="goSpin()">Daily Spin</button>
-  <button class="btn secondary" onclick="goBoard()">Leaderboard</button>
-</div>
-
-<div class="section" id="userStats">
-  🪙 Coins: <span id="coins">0</span> |
-  ⭐ Points: <span id="points">0</span> |
-  ⚡ XP: <span id="xp">0</span>
-</div>
-
-<div class="section">
-  <strong>How to Play</strong><br>
-  Move with arrow keys / WASD.<br>
-  Collect 🪙 ⬆️ 🕓 — avoid 💣
-</div>
-
-<div class="section">
-  Time Left: <span id="time">3:00</span>
-</div>
-
-<!-- GAME -->
-<div id="gameArea">
-
-  <!-- PLAYER -->
-  <div id="player">🟡</div>
-
-  <!-- WALLS -->
-  <div class="wall" style="top:0; left:0; width:100%; height:16px;"></div>
-  <div class="wall" style="bottom:0; left:0; width:100%; height:16px;"></div>
-  <div class="wall" style="top:0; left:0; width:16px; height:100%;"></div>
-  <div class="wall" style="top:0; right:0; width:16px; height:100%;"></div>
-
-  <div class="wall" style="top:90px; left:60px; width:260px; height:14px;"></div>
-  <div class="wall" style="top:180px; left:200px; width:14px; height:120px;"></div>
-  <div class="wall" style="top:260px; left:40px; width:220px; height:14px;"></div>
-
-</div>
-
-<div class="section">
-  <button class="btn primary" id="startBtn" onclick="startGame()">▶ Start Game</button>
-  <div id="lockMsg"></div>
-</div>
-
-<script>
-/* NAV */
-function goHub(){location.href="hub.html";}
-function goUpside(){location.href="upsidedown.html";}
-function goShop(){location.href="strangershop.html";}
-function goSpin(){location.href="dailyspin.html";}
-function goBoard(){location.href="leaderboard.html";}
-
-/* DAILY LOCK */
-const today = new Date().toDateString();
-if(localStorage.getItem("played") === today){
-  document.getElementById("startBtn").style.display="none";
-  document.getElementById("lockMsg").innerText =
-    "Uh-oh! You've already played today. Come back tomorrow!";
-}
-
-/* GAME START */
-function startGame(){
-  localStorage.setItem("played", today);
-  document.getElementById("topNav").style.display="none";
-  document.getElementById("startBtn").style.display="none";
-  startTimer();
-}
-
-/* TIMER */
-let seconds = 180;
-function startTimer(){
-  const t = setInterval(()=>{
-    seconds--;
-    const m = Math.floor(seconds/60);
-    const s = seconds%60;
-    document.getElementById("time").innerText =
-      m + ":" + (s<10?"0":"") + s;
-    if(seconds<=0) clearInterval(t);
-  },1000);
-}
-
-/* PLAYER MOVEMENT */
-const player = document.getElementById("player");
-const walls = document.querySelectorAll(".wall");
-const gameArea = document.getElementById("gameArea");
-
-let px = 30, py = 30;
-const speed = 6;
-
-document.addEventListener("keydown", e=>{
-  let nx = px, ny = py;
-  if(e.key==="ArrowUp"||e.key==="w") ny -= speed;
-  if(e.key==="ArrowDown"||e.key==="s") ny += speed;
-  if(e.key==="ArrowLeft"||e.key==="a") nx -= speed;
-  if(e.key==="ArrowRight"||e.key==="d") nx += speed;
-
-  if(!hitsWall(nx,ny)){
-    px = nx; py = ny;
-    player.style.left = px+"px";
-    player.style.top = py+"px";
-  }
-});
-
-function hitsWall(x,y){
-  const pr = {l:x,t:y,r:x+26,b:y+26};
-  for(const w of walls){
-    const wr = w.getBoundingClientRect();
-    const gr = gameArea.getBoundingClientRect();
-    const r = {
-      l:wr.left-gr.left,
-      t:wr.top-gr.top,
-      r:wr.right-gr.left,
-      b:wr.bottom-gr.top
-    };
-    if(pr.r>r.l && pr.l<r.r && pr.b>r.t && pr.t<r.b) return true;
-  }
-  return false;
-}
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
