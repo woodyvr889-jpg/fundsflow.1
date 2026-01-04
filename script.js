@@ -803,3 +803,78 @@ function hitsWall(x,y){
   }
   return false;
 }
+
+const player = document.getElementById('player');
+const scoreDisplay = document.getElementById('score');
+const timerDisplay = document.getElementById('timer');
+
+const gameArea = player.parentElement;
+const gameWidth = gameArea.clientWidth;
+const gameHeight = gameArea.clientHeight;
+
+let playerPos = { x: 180, y: 180 };
+let score = 0;
+let time = 60;
+let collectibles = [];
+
+// Create collectibles ⚡
+for (let i = 0; i < 5; i++) {
+  const c = document.createElement('div');
+  c.textContent = '⚡';
+  c.style.position = 'absolute';
+  c.style.fontSize = '1.5rem';
+  c.style.color = '#f5e050';
+  c.style.left = Math.random() * (gameWidth - 30) + 'px';
+  c.style.top = Math.random() * (gameHeight - 30) + 'px';
+  gameArea.appendChild(c);
+  collectibles.push(c);
+}
+
+// Movement
+document.addEventListener('keydown', (e) => {
+  const step = 10;
+  switch (e.key) {
+    case 'ArrowUp': playerPos.y -= step; break;
+    case 'ArrowDown': playerPos.y += step; break;
+    case 'ArrowLeft': playerPos.x -= step; break;
+    case 'ArrowRight': playerPos.x += step; break;
+  }
+  // Keep inside bounds
+  playerPos.x = Math.max(0, Math.min(gameWidth - 40, playerPos.x));
+  playerPos.y = Math.max(0, Math.min(gameHeight - 40, playerPos.y));
+  player.style.left = playerPos.x + 'px';
+  player.style.top = playerPos.y + 'px';
+
+  // Collision detection
+  collectibles.forEach((c, idx) => {
+    const cx = c.offsetLeft;
+    const cy = c.offsetTop;
+    const distance = Math.hypot(playerPos.x - cx, playerPos.y - cy);
+    if (distance < 30) {
+      score++;
+      scoreDisplay.textContent = 'Score: ' + score;
+      c.remove();
+      collectibles.splice(idx, 1);
+      if (score === 5) winGame();
+    }
+  });
+});
+
+// Timer
+const timerInterval = setInterval(() => {
+  time--;
+  timerDisplay.textContent = 'Time: ' + time + 's';
+  if (time <= 0) loseGame();
+}, 1000);
+
+// Win/Lose
+function winGame() {
+  clearInterval(timerInterval);
+  alert('🎉 YOU WON! Stranger Things style! 🎉');
+  window.location.href = 'hub.html';
+}
+function loseGame() {
+  clearInterval(timerInterval);
+  alert('⏰ TIME\'S UP! Try again!');
+  window.location.href = 'hub.html';
+}
