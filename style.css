@@ -55,6 +55,38 @@ h1, h2, .app-title, .user-name {
   text-shadow: 0 0 10px #e50914, 0 0 20px #e50914;
 }
 
+.top-header {
+  text-align:center;
+  margin-bottom:15px;
+}
+
+.top-header h1 {
+  font-size:2.5rem;
+  color:#e50914;
+  text-shadow:0 0 10px red;
+}
+
+.nav-buttons {
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.nav-buttons button {
+  background:#111;
+  color:#fff;
+  border:2px solid #e50914;
+  padding:8px 14px;
+  border-radius:10px;
+  cursor:pointer;
+  font-family:'ITC Benguiat', serif;
+}
+
+.nav-buttons button:hover {
+  background:#e50914;
+}
+
 /* =========================================================
    🎄 MOBILE SAFE DECORATIONS (NO PAGE SCALING)
 ========================================================= */
