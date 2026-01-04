@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Stranger Things Bid Game</title>
+<title>Stranger Things Bid Game — Maze Edition</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 @font-face {
@@ -13,42 +13,51 @@
   font-style: normal;
 }
 
-/* ============================
-   GENERAL STYLING
-============================ */
 body {
   margin:0;
   padding:0;
-  background:#0b0b20; /* dark Stranger Things vibe */
-  color:#e50914;
+  background:#0b0b20;
   font-family:'ITC Benguiat', serif;
   display:flex;
   justify-content:center;
   align-items:center;
   height:100vh;
   overflow:hidden;
+  color:#e50914;
+}
+
+#score-board {
+  position:absolute;
+  top:-50px;
+  font-size:1.3rem;
+  text-shadow: 0 0 5px #ff0000;
 }
 
 #game-container {
-  position: relative;
+  display: grid;
+  grid-template-columns: repeat(20, 30px);
+  grid-template-rows: repeat(20, 30px);
+  gap:1px;
+  position:relative;
   width: 600px;
   height: 600px;
-  background: #111;
+  background:#05050f;
   border: 3px solid #e50914;
-  display: grid;
-  grid-template-columns: repeat(20, 1fr);
-  grid-template-rows: repeat(20, 1fr);
-  gap: 1px;
 }
 
 .cell {
-  width: 100%;
-  height: 100%;
+  width:100%;
+  height:100%;
   display:flex;
   justify-content:center;
   align-items:center;
-  font-size: 1.2rem;
-  transition: all 0.3s;
+  font-size:1.2rem;
+  transition: all 0.2s;
+}
+
+.wall {
+  background: linear-gradient(135deg, #0b0010 0%, #220022 100%);
+  box-shadow: 0 0 10px #440044 inset, 0 0 15px #880088 inset;
 }
 
 .collectible {
@@ -56,20 +65,20 @@ body {
 }
 
 @keyframes glow {
-  0% { text-shadow: 0 0 5px #fff;}
-  50% { text-shadow: 0 0 10px #e50914, 0 0 15px #ff0000; }
-  100% { text-shadow: 0 0 5px #fff;}
+  0% { text-shadow:0 0 5px #fff; }
+  50% { text-shadow:0 0 10px #e50914, 0 0 15px #ff0000; }
+  100% { text-shadow:0 0 5px #fff; }
 }
 
 .player {
-  font-size: 1.4rem;
-  color: #00ffff;
+  font-size:1.4rem;
+  color:#00ffff;
   text-shadow: 0 0 10px #00ffff;
 }
 
 .bomb {
-  font-size: 1.3rem;
-  color: #ff4500;
+  font-size:1.3rem;
+  color:#ff4500;
   animation: pulse 0.8s infinite alternate;
 }
 
@@ -78,19 +87,11 @@ body {
   50% { transform: scale(1.3); }
   100% { transform: scale(1); }
 }
-
-/* SCORE DISPLAY */
-#score-board {
-  position: absolute;
-  top: -50px;
-  font-size: 1.2rem;
-}
 </style>
 </head>
 <body>
 
 <div id="score-board">Score: 0</div>
-
 <div id="game-container"></div>
 
 <script>
@@ -98,18 +99,46 @@ const container = document.getElementById('game-container');
 const rows = 20;
 const cols = 20;
 
-let playerPos = {x:10, y:10};
+let playerPos = {x:1, y:1};
 let score = 0;
+
+// ==============================
+// MAZE LAYOUT
+// 0 = empty, 1 = wall
+// ==============================
+const maze = [
+[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+[1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
+[1,0,1,0,1,0,1,1,1,0,1,0,1,1,1,0,1,0,0,1],
+[1,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,1,0,0,1],
+[1,0,1,1,1,1,0,0,1,1,1,1,0,0,1,0,1,1,0,1],
+[1,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,1,0,1],
+[1,1,1,1,0,1,1,1,1,0,1,1,1,0,1,1,0,1,0,1],
+[1,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,0,0,1],
+[1,0,1,1,1,1,1,0,1,1,1,0,1,1,0,1,1,1,0,1],
+[1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1],
+[1,1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,0,1],
+[1,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,1,0,1],
+[1,0,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1,0,1],
+[1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,1],
+[1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1,1],
+[1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,1],
+[1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
+[1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1],
+[1,0,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,0,1],
+[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+];
 
 // ==============================
 // GENERATE GRID
 // ==============================
 const grid = [];
 for(let y=0; y<rows; y++){
-  const row = [];
+  const row=[];
   for(let x=0; x<cols; x++){
     const cell = document.createElement('div');
     cell.classList.add('cell');
+    if(maze[y][x]===1) cell.classList.add('wall');
     container.appendChild(cell);
     row.push(cell);
   }
@@ -117,45 +146,46 @@ for(let y=0; y<rows; y++){
 }
 
 // ==============================
-// SPAWN ITEMS
+// SPAWN COLLECTIBLES
 // ==============================
-function randomCell(){
-  return {x: Math.floor(Math.random()*cols), y: Math.floor(Math.random()*rows)};
-}
-
 const collectibles = ['🪙','⬆️','🕓'];
 const bombs = [];
 
 function spawnCollectible(){
-  const pos = randomCell();
+  let pos;
+  do{
+    pos={x: Math.floor(Math.random()*cols), y: Math.floor(Math.random()*rows)};
+  }while(maze[pos.y][pos.x]===1 || grid[pos.y][pos.x].textContent); // avoid walls & existing items
   const cell = grid[pos.y][pos.x];
-  if(cell.textContent) return; // already occupied
   const emoji = collectibles[Math.floor(Math.random()*collectibles.length)];
   cell.textContent = emoji;
   cell.classList.add('collectible');
 }
 
 function spawnBomb(){
-  const pos = randomCell();
+  let pos;
+  do{
+    pos={x: Math.floor(Math.random()*cols), y: Math.floor(Math.random()*rows)};
+  }while(maze[pos.y][pos.x]===1 || grid[pos.y][pos.x].textContent);
   const cell = grid[pos.y][pos.x];
-  if(cell.textContent) return; // avoid overlapping
-  cell.textContent = '💣';
+  cell.textContent='💣';
   cell.classList.add('bomb');
-  bombs.push({x: pos.x, y: pos.y, timer: 3}); // explodes in 3 secs
+  bombs.push({x: pos.x, y: pos.y, timer:3});
 }
 
-// Spawn initial items
-for(let i=0;i<30;i++) spawnCollectible();
-setInterval(spawnCollectible, 5000); // new collectible every 5s
-setInterval(spawnBomb, 8000); // new bomb every 8s
+// Initial spawn
+for(let i=0;i<20;i++) spawnCollectible();
+setInterval(spawnCollectible, 6000);
+setInterval(spawnBomb, 9000);
 
 // ==============================
 // PLAYER
 // ==============================
 function renderPlayer(){
-  // Clear previous
-  grid.flat().forEach(c=>{ if(!c.classList.contains('bomb') && !c.classList.contains('collectible')) c.textContent = ''; });
-  grid[playerPos.y][playerPos.x].textContent = '😎';
+  grid.flat().forEach(c=>{
+    if(!c.classList.contains('bomb') && !c.classList.contains('collectible') && !c.classList.contains('wall')) c.textContent='';
+  });
+  grid[playerPos.y][playerPos.x].textContent='😎';
   grid[playerPos.y][playerPos.x].classList.add('player');
 }
 renderPlayer();
@@ -163,44 +193,44 @@ renderPlayer();
 // ==============================
 // MOVEMENT
 // ==============================
-document.addEventListener('keydown', (e)=>{
-  let newX = playerPos.x;
-  let newY = playerPos.y;
+document.addEventListener('keydown', e=>{
+  let newX=playerPos.x;
+  let newY=playerPos.y;
   if(e.key==='ArrowUp') newY--;
   if(e.key==='ArrowDown') newY++;
   if(e.key==='ArrowLeft') newX--;
   if(e.key==='ArrowRight') newX++;
 
-  // Boundaries
+  // Boundaries & walls
   if(newX<0||newX>=cols||newY<0||newY>=rows) return;
+  if(maze[newY][newX]===1) return;
 
   const targetCell = grid[newY][newX];
 
-  // Check collectibles
+  // Collectibles
   if(targetCell.classList.contains('collectible')){
-    score += 100;
+    score+=100;
     targetCell.classList.remove('collectible');
   }
 
-  // Check bomb
+  // Bombs
   if(targetCell.classList.contains('bomb')){
     alert('💥 Boom! Game over!');
-    score = 0;
+    score=0;
     bombs.forEach(b=>grid[b.y][b.x].textContent='');
     bombs.length=0;
-    // Reset player
-    playerPos={x:10,y:10};
-  } else {
+    playerPos={x:1,y:1};
+  }else{
     playerPos.x=newX;
     playerPos.y=newY;
   }
 
   renderPlayer();
-  document.getElementById('score-board').textContent = 'Score: '+score;
+  document.getElementById('score-board').textContent='Score: '+score;
 });
 
 // ==============================
-// BOMB TIMER & EXPLOSIONS
+// BOMB TIMER
 // ==============================
 setInterval(()=>{
   for(let i=bombs.length-1;i>=0;i--){
@@ -211,11 +241,10 @@ setInterval(()=>{
       cell.textContent='💥';
       cell.classList.remove('bomb');
       bombs.splice(i,1);
-      setTimeout(()=>{ cell.textContent=''; }, 500); // remove explosion after 0.5s
+      setTimeout(()=>{ cell.textContent=''; }, 500);
     }
   }
 },1000);
-
 </script>
 </body>
 </html>
