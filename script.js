@@ -8,6 +8,7 @@
    - Normal Shop open, Shop+ shown as closed
    - Admin unlock (codes only in JS)
    - Christmas theme with candy-cane support
+   - Stranger Things, Stranger Game, Stranger Shop, Daily spin, etc. 
 ===================================================== */
 
 /* ---------- CHRISTMAS THEME OVERRIDE ----------
