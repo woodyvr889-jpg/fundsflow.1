@@ -731,14 +731,14 @@ let time = 60;
 let collectibles = [];
 
 /* =========================================================
-   STRANGER GAME SCRIPT (UPGRADED)
+   STRANGER GAME SCRIPT (UPGRADED FOR NEW GAME.HTML)
 ========================================================= */
 
 const gameArea = document.getElementById("gameArea");
 const player = document.getElementById("player");
 const scoreDisplay = document.getElementById("score");
 const coinsDisplay = document.getElementById("coins");
-const timerDisplay = document.getElementById("timer");
+const timerDisplay = document.getElementById("time");
 
 let playerPos = { x: 180, y: 180 };
 let score = 0;
@@ -751,13 +751,15 @@ const maxCollectibles = 10;
 
 // Create random collectibles (⚡, 🕓, 🪙, ⬆️, 💣)
 const types = ["⚡", "🕓", "🪙", "⬆️", "💣"];
-for (let i = 0; i < maxCollectibles; i++) {
+const colorMap = { "⚡":"#f5e050", "🕓":"#00ffff", "🪙":"#ffcc00", "⬆️":"#00ff00", "💣":"#ff0000" };
+
+function spawnCollectible(){
   const c = document.createElement("div");
+  c.classList.add("collectible");
   c.style.position = "absolute";
   c.style.fontSize = "1.5rem";
-  c.textContent = types[Math.floor(Math.random() * types.length)];
 
-  const colorMap = { "⚡":"#f5e050", "🕓":"#00ffff", "🪙":"#ffcc00", "⬆️":"#00ff00", "💣":"#ff0000" };
+  c.textContent = types[Math.floor(Math.random() * types.length)];
   c.style.color = colorMap[c.textContent] || "#fff";
 
   c.style.left = Math.random() * (gameArea.clientWidth - 30) + "px";
@@ -767,10 +769,13 @@ for (let i = 0; i < maxCollectibles; i++) {
   collectibles.push(c);
 }
 
-// Movement (keyboard)
-document.addEventListener("keydown", (e) => {
+// Spawn initial collectibles
+for(let i=0;i<maxCollectibles;i++) spawnCollectible();
+
+// Player Movement (Keyboard)
+document.addEventListener("keydown", (e)=>{
   let step = speed;
-  if (speedBoost) step = 12; // boosted speed
+  if(speedBoost) step = 12;
 
   switch(e.key){
     case "ArrowUp": playerPos.y -= step; break;
@@ -779,7 +784,7 @@ document.addEventListener("keydown", (e) => {
     case "ArrowRight": playerPos.x += step; break;
   }
 
-  // Keep player inside bounds
+  // Keep player inside game area
   playerPos.x = Math.max(0, Math.min(gameArea.clientWidth - 40, playerPos.x));
   playerPos.y = Math.max(0, Math.min(gameArea.clientHeight - 40, playerPos.y));
 
@@ -787,10 +792,11 @@ document.addEventListener("keydown", (e) => {
   player.style.top = playerPos.y + "px";
 
   // Collision detection
-  collectibles.forEach((c, idx) => {
+  collectibles.forEach((c, idx)=>{
     const cx = c.offsetLeft;
     const cy = c.offsetTop;
     const distance = Math.hypot(playerPos.x - cx, playerPos.y - cy);
+
     if(distance < 30){
       const type = c.textContent;
 
@@ -805,6 +811,7 @@ document.addEventListener("keydown", (e) => {
         case "💣":
           alert("💣 BOOM! Game over!");
           returnToHub();
+          return; // stop processing this collision
       }
 
       // Update displays
@@ -817,7 +824,7 @@ document.addEventListener("keydown", (e) => {
     }
   });
 
-  // Win condition: all collectibles collected
+  // Win condition
   if(collectibles.length === 0){
     alert("🎉 YOU WON! Stranger Things style! 🎉");
     returnToHub();
@@ -825,14 +832,14 @@ document.addEventListener("keydown", (e) => {
 });
 
 // Timer
-const timerInterval = setInterval(() => {
+const timerInterval = setInterval(()=>{
   time--;
   timerDisplay.textContent = "Time: " + time + "s";
   if(time <= 0){
     alert("⏰ TIME'S UP! Try again!");
     returnToHub();
   }
-}, 1000);
+},1000);
 
 function returnToHub(){
   clearInterval(timerInterval);
