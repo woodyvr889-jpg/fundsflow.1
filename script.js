@@ -1,4 +1,4 @@
-"use strict";
+ "use strict";
 
 /* =====================================================
    FundsFlow v100 — One JS File (Login + Hub)
@@ -806,11 +806,10 @@ function hitsWall(x,y){
   return false;
 }
 
-const player = document.getElementById('player');
+/* GAMEPLAY: SCORE, TIMER, COLLECTIBLES */
 const scoreDisplay = document.getElementById('score');
 const timerDisplay = document.getElementById('timer');
 
-const gameArea = player.parentElement;
 const gameWidth = gameArea.clientWidth;
 const gameHeight = gameArea.clientHeight;
 
@@ -832,7 +831,7 @@ for (let i = 0; i < 5; i++) {
   collectibles.push(c);
 }
 
-// Movement
+// Movement & collision detection
 document.addEventListener('keydown', (e) => {
   const step = 10;
   switch (e.key) {
@@ -847,7 +846,6 @@ document.addEventListener('keydown', (e) => {
   player.style.left = playerPos.x + 'px';
   player.style.top = playerPos.y + 'px';
 
-  // Collision detection
   collectibles.forEach((c, idx) => {
     const cx = c.offsetLeft;
     const cy = c.offsetTop;
@@ -862,14 +860,14 @@ document.addEventListener('keydown', (e) => {
   });
 });
 
-// Timer
+// Timer countdown
 const timerInterval = setInterval(() => {
   time--;
   timerDisplay.textContent = 'Time: ' + time + 's';
   if (time <= 0) loseGame();
 }, 1000);
 
-// Win/Lose
+// Win/Lose handlers
 function winGame() {
   clearInterval(timerInterval);
   alert('🎉 YOU WON! Stranger Things style! 🎉');
@@ -880,3 +878,4 @@ function loseGame() {
   alert('⏰ TIME\'S UP! Try again!');
   window.location.href = 'hub.html';
 }
+
