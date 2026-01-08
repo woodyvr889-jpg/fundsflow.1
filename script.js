@@ -31,11 +31,10 @@ const storage = (() => {
     getItem: k => (k in mem ? mem[k] : null),
     setItem: (k, v) => (mem[k] = String(v)),
     removeItem: k => delete mem[k]
-  };
-})();
+
 
 /* =====================================================
-   PROFILE LOGIN
+   LOGIN PROFILE CARDS
 ===================================================== */
 
 const USERS = [
@@ -43,33 +42,40 @@ const USERS = [
   { name: "Mum", code: "1111" },
   { name: "Dad", code: "1111" },
   { name: "Nanna", code: "1111" },
+  { name: "Grandad Steve", code: "1111" },
   { name: "Grandad Darren", code: "1111" },
   { name: "Grandma Jean", code: "1111" },
-  { name: "Grandad Steve", code: "1111" },
   { name: "Uncle Paul", code: "1111" }
 ];
 
-const profilesDiv = document.getElementById("profiles");
+const profilesContainer = document.getElementById("profiles");
 
-// Generate profile cards
-USERS.forEach(user => {
-  const card = document.createElement("div");
-  card.className = "profile-card";
-  card.textContent = user.name;
-  profilesDiv.appendChild(card);
+if (profilesContainer) {
+  // Clear just in case
+  profilesContainer.innerHTML = "";
 
-  // When clicked, prompt for code
-  card.addEventListener("click", () => {
-    const inputCode = prompt(`Enter the code for ${user.name}:`);
-    if (inputCode === user.code) {
-      localStorage.setItem("currentUser", user.name);
-      alert(`Welcome, ${user.name}!`);
-      window.location.href = "hub.html";
-    } else {
-      alert("Incorrect code. Try again.");
-    }
+  USERS.forEach(user => {
+    const card = document.createElement("div");
+    card.classList.add("profile-card");
+    card.textContent = user.name;
+
+    // Click event
+    card.addEventListener("click", () => {
+      const enteredCode = prompt(`Enter passcode for ${user.name}:`);
+      if (enteredCode === user.code) {
+        // Save current user
+        localStorage.setItem("currentUser", user.name);
+        alert(`Welcome, ${user.name}!`);
+        window.location.href = "hub.html";
+      } else {
+        alert("Incorrect code. Try again.");
+      }
+    });
+
+    profilesContainer.appendChild(card);
   });
-});
+}     
+  
 
 /* ---------- ADMIN CODES (ONLY HERE) ---------- */
 const ADMIN_UNLOCK_CODES = ["7772", "1994029", "080512", "1112"];
