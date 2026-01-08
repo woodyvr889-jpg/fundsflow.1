@@ -66,6 +66,27 @@
     font-weight: bold;
     font-size: 1.2rem;
   }
+
+  /* Arcade buttons */
+  #arcade-buttons {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+  }
+  #arcade-buttons button {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+    background: linear-gradient(45deg,#4b0000,#8b0000);
+    color: red;
+    font-weight: bold;
+    border: 2px solid #550000;
+    border-radius: 8px;
+    cursor: pointer;
+  }
 </style>
 </head>
 <body data-page="game">
@@ -88,6 +109,14 @@
 
 <div id="gameArea">
   <div id="player"></div>
+</div>
+
+<!-- Arcade Buttons for mobile/arcade play -->
+<div id="arcade-buttons">
+  <button id="upBtn">⬆️</button>
+  <button id="leftBtn">⬅️</button>
+  <button id="downBtn">⬇️</button>
+  <button id="rightBtn">➡️</button>
 </div>
 
 <script src="script.js"></script>
