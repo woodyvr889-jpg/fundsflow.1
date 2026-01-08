@@ -11,6 +11,8 @@
    - Stranger Things, Stranger Game, Stranger Shop, Daily spin, etc. 
 ===================================================== */
 
+alert("script.js is running");
+
 /* ---------- CHRISTMAS THEME OVERRIDE ----------
    null        = auto by real date
    "xmas"      = Christmas season (red/green)
