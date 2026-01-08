@@ -721,94 +721,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (page === "hub")   initHubPage();
 });
 
-/* =========================================================
-   STRANGER GAME SCRIPT
-========================================================= */
-
-/* NAVIGATION */
-function goHub(){location.href="hub.html";}
-function goUpside(){location.href="upsidedown.html";}
-function goShop(){location.href="strangershop.html";}
-function goSpin(){location.href="dailyspin.html";}
-function goBoard(){location.href="leaderboard.html";}
-
-/* DAILY PLAY LOCK */
-const today = new Date().toDateString();
-if(localStorage.getItem("played") === today){
-  const startBtn = document.getElementById("startBtn");
-  if(startBtn) startBtn.style.display="none";
-  const lockMsg = document.getElementById("lockMsg");
-  if(lockMsg) lockMsg.innerText =
-    "Uh-oh! You've already played today. Come back tomorrow!";
-}
-
-/* GAME START */
-function startGame(){
-  localStorage.setItem("played", today);
-  const topNav = document.getElementById("topNav");
-  if(topNav) topNav.style.display="none";
-  const startBtn = document.getElementById("startBtn");
-  if(startBtn) startBtn.style.display="none";
-  startTimer();
-}
-
-/* TIMER */
-let seconds = 180;
-function startTimer(){
-  const t = setInterval(()=>{
-    seconds--;
-    const m = Math.floor(seconds/60);
-    const s = seconds%60;
-    const timeEl = document.getElementById("time");
-    if(timeEl) timeEl.innerText =
-      m + ":" + (s<10?"0":"") + s;
-    if(seconds<=0) clearInterval(t);
-  },1000);
-}
-
-/* PLAYER MOVEMENT */
-const player = document.getElementById("player");
-const walls = document.querySelectorAll(".wall");
-const gameArea = document.getElementById("gameArea");
-
-let px = 30, py = 30;
-const speed = 6;
-
-document.addEventListener("keydown", e=>{
-  if(!player) return;
-  let nx = px, ny = py;
-  if(e.key==="ArrowUp"||e.key==="w") ny -= speed;
-  if(e.key==="ArrowDown"||e.key==="s") ny += speed;
-  if(e.key==="ArrowLeft"||e.key==="a") nx -= speed;
-  if(e.key==="ArrowRight"||e.key==="d") nx += speed;
-
-  if(!hitsWall(nx,ny)){
-    px = nx; py = ny;
-    player.style.left = px+"px";
-    player.style.top = py+"px";
-  }
-});
-
-function hitsWall(x,y){
-  if(!walls || walls.length===0 || !gameArea) return false;
-  const pr = {l:x,t:y,r:x+26,b:y+26};
-  const gr = gameArea.getBoundingClientRect();
-  for(const w of walls){
-    const wr = w.getBoundingClientRect();
-    const r = {
-      l:wr.left-gr.left,
-      t:wr.top-gr.top,
-      r:wr.right-gr.left,
-      b:wr.bottom-gr.top
-    };
-    if(pr.r>r.l && pr.l<r.r && pr.b>r.t && pr.t<r.b) return true;
-  }
-  return false;
-}
-
-/* GAMEPLAY: SCORE, TIMER, COLLECTIBLES */
-const scoreDisplay = document.getElementById('score');
-const timerDisplay = document.getElementById('timer');
 
 const gameWidth = gameArea.clientWidth;
 const gameHeight = gameArea.clientHeight;
@@ -818,64 +730,111 @@ let score = 0;
 let time = 60;
 let collectibles = [];
 
-// Create collectibles ⚡
-for (let i = 0; i < 5; i++) {
-  const c = document.createElement('div');
-  c.textContent = '⚡';
-  c.style.position = 'absolute';
-  c.style.fontSize = '1.5rem';
-  c.style.color = '#f5e050';
-  c.style.left = Math.random() * (gameWidth - 30) + 'px';
-  c.style.top = Math.random() * (gameHeight - 30) + 'px';
+/* =========================================================
+   STRANGER GAME SCRIPT (UPGRADED)
+========================================================= */
+
+const gameArea = document.getElementById("gameArea");
+const player = document.getElementById("player");
+const scoreDisplay = document.getElementById("score");
+const coinsDisplay = document.getElementById("coins");
+const timerDisplay = document.getElementById("timer");
+
+let playerPos = { x: 180, y: 180 };
+let score = 0;
+let coins = 0;
+let time = 60;
+let speed = 6;
+let speedBoost = false;
+let collectibles = [];
+const maxCollectibles = 10;
+
+// Create random collectibles (⚡, 🕓, 🪙, ⬆️, 💣)
+const types = ["⚡", "🕓", "🪙", "⬆️", "💣"];
+for (let i = 0; i < maxCollectibles; i++) {
+  const c = document.createElement("div");
+  c.style.position = "absolute";
+  c.style.fontSize = "1.5rem";
+  c.textContent = types[Math.floor(Math.random() * types.length)];
+
+  const colorMap = { "⚡":"#f5e050", "🕓":"#00ffff", "🪙":"#ffcc00", "⬆️":"#00ff00", "💣":"#ff0000" };
+  c.style.color = colorMap[c.textContent] || "#fff";
+
+  c.style.left = Math.random() * (gameArea.clientWidth - 30) + "px";
+  c.style.top = Math.random() * (gameArea.clientHeight - 30) + "px";
+
   gameArea.appendChild(c);
   collectibles.push(c);
 }
 
-// Movement & collision detection
-document.addEventListener('keydown', (e) => {
-  const step = 10;
-  switch (e.key) {
-    case 'ArrowUp': playerPos.y -= step; break;
-    case 'ArrowDown': playerPos.y += step; break;
-    case 'ArrowLeft': playerPos.x -= step; break;
-    case 'ArrowRight': playerPos.x += step; break;
-  }
-  // Keep inside bounds
-  playerPos.x = Math.max(0, Math.min(gameWidth - 40, playerPos.x));
-  playerPos.y = Math.max(0, Math.min(gameHeight - 40, playerPos.y));
-  player.style.left = playerPos.x + 'px';
-  player.style.top = playerPos.y + 'px';
+// Movement (keyboard)
+document.addEventListener("keydown", (e) => {
+  let step = speed;
+  if (speedBoost) step = 12; // boosted speed
 
+  switch(e.key){
+    case "ArrowUp": playerPos.y -= step; break;
+    case "ArrowDown": playerPos.y += step; break;
+    case "ArrowLeft": playerPos.x -= step; break;
+    case "ArrowRight": playerPos.x += step; break;
+  }
+
+  // Keep player inside bounds
+  playerPos.x = Math.max(0, Math.min(gameArea.clientWidth - 40, playerPos.x));
+  playerPos.y = Math.max(0, Math.min(gameArea.clientHeight - 40, playerPos.y));
+
+  player.style.left = playerPos.x + "px";
+  player.style.top = playerPos.y + "px";
+
+  // Collision detection
   collectibles.forEach((c, idx) => {
     const cx = c.offsetLeft;
     const cy = c.offsetTop;
     const distance = Math.hypot(playerPos.x - cx, playerPos.y - cy);
-    if (distance < 30) {
-      score++;
-      scoreDisplay.textContent = 'Score: ' + score;
+    if(distance < 30){
+      const type = c.textContent;
+
+      switch(type){
+        case "⚡": score += 10; break;
+        case "🪙": coins += 1; break;
+        case "🕓": time += 10; break;
+        case "⬆️":
+          speedBoost = true;
+          setTimeout(()=>{speedBoost=false},5000);
+          break;
+        case "💣":
+          alert("💣 BOOM! Game over!");
+          returnToHub();
+      }
+
+      // Update displays
+      scoreDisplay.textContent = "Score: " + score;
+      coinsDisplay.textContent = "Coins: " + coins;
+
+      // Remove collectible
       c.remove();
-      collectibles.splice(idx, 1);
-      if (score === 5) winGame();
+      collectibles.splice(idx,1);
     }
   });
+
+  // Win condition: all collectibles collected
+  if(collectibles.length === 0){
+    alert("🎉 YOU WON! Stranger Things style! 🎉");
+    returnToHub();
+  }
 });
 
-// Timer countdown
+// Timer
 const timerInterval = setInterval(() => {
   time--;
-  timerDisplay.textContent = 'Time: ' + time + 's';
-  if (time <= 0) loseGame();
+  timerDisplay.textContent = "Time: " + time + "s";
+  if(time <= 0){
+    alert("⏰ TIME'S UP! Try again!");
+    returnToHub();
+  }
 }, 1000);
 
-// Win/Lose handlers
-function winGame() {
+function returnToHub(){
   clearInterval(timerInterval);
-  alert('🎉 YOU WON! Stranger Things style! 🎉');
-  window.location.href = 'hub.html';
+  window.location.href = "hub.html";
 }
-function loseGame() {
-  clearInterval(timerInterval);
-  alert('⏰ TIME\'S UP! Try again!');
-  window.location.href = 'hub.html';
-}
-
