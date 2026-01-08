@@ -749,45 +749,51 @@ let speedBoost = false;
 let collectibles = [];
 const maxCollectibles = 10;
 
-// Create random collectibles (⚡, 🕓, 🪙, ⬆️, 💣)
+// Types and colors
 const types = ["⚡", "🕓", "🪙", "⬆️", "💣"];
 const colorMap = { "⚡":"#f5e050", "🕓":"#00ffff", "🪙":"#ffcc00", "⬆️":"#00ff00", "💣":"#ff0000" };
 
+// Spawn a collectible
 function spawnCollectible(){
   const c = document.createElement("div");
   c.classList.add("collectible");
-  c.style.position = "absolute";
   c.style.fontSize = "1.5rem";
-
-  c.textContent = types[Math.floor(Math.random() * types.length)];
+  c.textContent = types[Math.floor(Math.random()*types.length)];
   c.style.color = colorMap[c.textContent] || "#fff";
-
-  c.style.left = Math.random() * (gameArea.clientWidth - 30) + "px";
-  c.style.top = Math.random() * (gameArea.clientHeight - 30) + "px";
-
+  c.style.left = Math.random()*(gameArea.clientWidth-30) + "px";
+  c.style.top = Math.random()*(gameArea.clientHeight-30) + "px";
   gameArea.appendChild(c);
   collectibles.push(c);
 }
 
-// Spawn initial collectibles
+// Initial spawn
 for(let i=0;i<maxCollectibles;i++) spawnCollectible();
 
-// Player Movement (Keyboard)
+// Keyboard movement
 document.addEventListener("keydown", (e)=>{
-  let step = speed;
-  if(speedBoost) step = 12;
-
+  let dx=0, dy=0;
   switch(e.key){
-    case "ArrowUp": playerPos.y -= step; break;
-    case "ArrowDown": playerPos.y += step; break;
-    case "ArrowLeft": playerPos.x -= step; break;
-    case "ArrowRight": playerPos.x += step; break;
+    case "ArrowUp": dy=-speed; break;
+    case "ArrowDown": dy=speed; break;
+    case "ArrowLeft": dx=-speed; break;
+    case "ArrowRight": dx=speed; break;
   }
+  movePlayer(dx,dy);
+});
 
-  // Keep player inside game area
-  playerPos.x = Math.max(0, Math.min(gameArea.clientWidth - 40, playerPos.x));
-  playerPos.y = Math.max(0, Math.min(gameArea.clientHeight - 40, playerPos.y));
+// Arcade button movement
+document.getElementById("upBtn").addEventListener("click", ()=>movePlayer(0,-speed));
+document.getElementById("downBtn").addEventListener("click", ()=>movePlayer(0,speed));
+document.getElementById("leftBtn").addEventListener("click", ()=>movePlayer(-speed,0));
+document.getElementById("rightBtn").addEventListener("click", ()=>movePlayer(speed,0));
 
+// Movement function
+function movePlayer(dx,dy){
+  let stepX = dx, stepY = dy;
+  if(speedBoost){ stepX*=2; stepY*=2; }
+
+  playerPos.x = Math.max(0, Math.min(gameArea.clientWidth - 40, playerPos.x + stepX));
+  playerPos.y = Math.max(0, Math.min(gameArea.clientHeight - 40, playerPos.y + stepY));
   player.style.left = playerPos.x + "px";
   player.style.top = playerPos.y + "px";
 
@@ -796,10 +802,8 @@ document.addEventListener("keydown", (e)=>{
     const cx = c.offsetLeft;
     const cy = c.offsetTop;
     const distance = Math.hypot(playerPos.x - cx, playerPos.y - cy);
-
     if(distance < 30){
       const type = c.textContent;
-
       switch(type){
         case "⚡": score += 10; break;
         case "🪙": coins += 1; break;
@@ -811,14 +815,10 @@ document.addEventListener("keydown", (e)=>{
         case "💣":
           alert("💣 BOOM! Game over!");
           returnToHub();
-          return; // stop processing this collision
+          return;
       }
-
-      // Update displays
       scoreDisplay.textContent = "Score: " + score;
       coinsDisplay.textContent = "Coins: " + coins;
-
-      // Remove collectible
       c.remove();
       collectibles.splice(idx,1);
     }
@@ -829,14 +829,14 @@ document.addEventListener("keydown", (e)=>{
     alert("🎉 YOU WON! Stranger Things style! 🎉");
     returnToHub();
   }
-});
+}
 
 // Timer
 const timerInterval = setInterval(()=>{
   time--;
   timerDisplay.textContent = "Time: " + time + "s";
   if(time <= 0){
-    alert("⏰ TIME'S UP! Try again!");
+    alert("⏰ TIME'S UP! Thanks for playing! Send James a screenshot of your results, and your dtats and live leaderboards shall be updsted! Make sure to come back tomorrow!");
     returnToHub();
   }
 },1000);
