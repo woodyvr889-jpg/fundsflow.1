@@ -1,28 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Stranger Game</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stranger Game</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    background: linear-gradient(135deg,#000000,#1a0a0a);
+    color: red;
+    font-family: 'Stranger Things', sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  h1 {
+    color: red;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 1rem;
+  }
+  .top-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .top-buttons button {
+    background: linear-gradient(45deg,#4b0000,#8b0000);
+    color: red;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border: 2px solid #550000;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Stranger Things', sans-serif;
+  }
+  #gameArea {
+    position: relative;
+    width: 90vw;
+    max-width: 800px;
+    height: 500px;
+    margin: 2rem auto;
+    background: linear-gradient(45deg,#111,#440000);
+    border: 3px solid red;
+    overflow: hidden;
+  }
+  #player {
+    width: 40px;
+    height: 40px;
+    background: red;
+    position: absolute;
+    top: 180px;
+    left: 180px;
+    border-radius: 5px;
+  }
+  .collectible {
+    position: absolute;
+    font-size: 1.5rem;
+  }
+  #stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+</style>
 </head>
-<body data-theme-mode="christmas">
-  <div class="top-header">
-    <h1>STRANGER GAME</h1>
-  </div>
+<body data-page="game">
 
-  <div class="main-shell">
-    <div class="card" style="text-align:center;">
-      <p>Use Arrow Keys to move!</p>
-      <p>Collect all ⚡ to win before time runs out!</p>
-      <div id="score">Score: 0</div>
-      <div id="timer">Time: 60s</div>
-    </div>
+<h1>🎮 Stranger Game</h1>
 
-    <div class="card" style="position:relative; height:400px; background: #020617; overflow:hidden;">
-      <div id="player" style="width:40px; height:40px; background:red; position:absolute; top:180px; left:180px; border-radius:10px; box-shadow:0 0 10px red;"></div>
-    </div>
-  </div>
+<div class="top-buttons">
+  <button onclick="location.href='hub.html'">Hub</button>
+  <button onclick="location.href='dailyspin.html'">Daily Spin</button>
+  <button onclick="location.href='leaderboard.html'">Stranger Leaderboard</button>
+  <button onclick="location.href='strangershop.html'">Stranger Shop</button>
+  <button onclick="location.href='upsidedown.html'">Upside Down</button>
+</div>
 
-  <script src="script.js"></script>
+<div id="stats">
+  <div id="score">Score: 0</div>
+  <div id="coins">Coins: 0</div>
+  <div id="time">Time: 60s</div>
+</div>
+
+<div id="gameArea">
+  <div id="player"></div>
+</div>
+
+<script src="script.js"></script>
+
 </body>
 </html>
