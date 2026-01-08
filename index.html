@@ -1,62 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>FundsFlow v100 — Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stranger Login</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    background: linear-gradient(135deg,#000,#1a0a0a);
+    color: red;
+    font-family: 'Stranger Things', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+  }
+  h1 {
+    font-weight: bold;
+    margin-bottom: 2rem;
+  }
+  .login-box {
+    background: #110000;
+    padding: 2rem;
+    border: 2px solid red;
+    border-radius: 10px;
+    text-align: center;
+  }
+  input {
+    display: block;
+    margin: 1rem auto;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid red;
+    background: #220000;
+    color: red;
+    font-family: 'Stranger Things', sans-serif;
+  }
+  button {
+    background: linear-gradient(45deg,#4b0000,#8b0000);
+    color: red;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border: 2px solid #550000;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Stranger Things', sans-serif;
+  }
+  #profile-selection {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  .profile {
+    padding: 0.5rem 1rem;
+    border: 2px solid red;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .profile.selected {
+    background: red;
+    color: black;
+  }
+  #error {
+    color: yellow;
+    margin-top: 1rem;
+    font-weight: bold;
+  }
+</style>
 </head>
+<body>
 
-<body data-page="login" class="login-body">
+<h1>🎬 Stranger Login</h1>
 
-  <div id="toastContainer" class="toast-container"></div>
+<div class="login-box">
+  <div id="profile-selection">
+    <div class="profile" data-user="Mike">Mike</div>
+    <div class="profile" data-user="Eleven">Eleven</div>
+    <div class="profile" data-user="Lucas">Lucas</div>
+  </div>
 
-  <!-- HEADER -->
-  <header class="top-header glass compact">
-    <h1 class="app-title">
-      <span class="gradient-text">FundsFlow</span>
-      <span class="version-tag">v100</span>
-    </h1>
-    <p class="header-sub">Select your profile to continue</p>
-  </header>
+  <input type="password" id="passcode" placeholder="Enter Passcode">
+  <button id="loginBtn">Login</button>
+  <div id="error"></div>
+</div>
 
-  <main class="main-shell">
+<script>
+  document.addEventListener("DOMContentLoaded", ()=>{
 
-    <!-- PROFILE GRID -->
-    <section class="card glass" id="profilesCard">
-      <h2>Choose your profile</h2>
-      <p class="muted small">Tap a name → enter your keypad code.</p>
-      <div id="loginProfiles" class="user-grid"></div>
-    </section>
+    let selectedUser = null;
+    const profiles = document.querySelectorAll(".profile");
+    profiles.forEach(p=>{
+      p.addEventListener("click", ()=>{
+        profiles.forEach(p2=>p2.classList.remove("selected"));
+        p.classList.add("selected");
+        selectedUser = p.dataset.user;
+      });
+    });
 
-    <!-- KEYPAD -->
-    <section id="keypadSection" class="card glass hidden">
-      <h2 id="keypadTitle">Enter code</h2>
+    document.getElementById("loginBtn").addEventListener("click", ()=>{
+      const passcode = document.getElementById("passcode").value;
+      const error = document.getElementById("error");
 
-      <div id="keypadDisplay" class="keypad-display">----</div>
+      if(!selectedUser){
+        error.textContent = "Please select a profile!";
+        return;
+      }
+      if(passcode==="1234"){ // example passcode
+        localStorage.setItem("currentUser", selectedUser);
+        window.location.href="hub.html";
+      } else {
+        error.textContent = "Incorrect passcode!";
+      }
+    });
 
-      <div class="keypad">
-        <button class="key-btn" data-num="1">1</button>
-        <button class="key-btn" data-num="2">2</button>
-        <button class="key-btn" data-num="3">3</button>
-        <button class="key-btn" data-num="4">4</button>
-        <button class="key-btn" data-num="5">5</button>
-        <button class="key-btn" data-num="6">6</button>
-        <button class="key-btn" data-num="7">7</button>
-        <button class="key-btn" data-num="8">8</button>
-        <button class="key-btn" data-num="9">9</button>
-        <button class="key-btn danger" data-action="clear">Clear</button>
-        <button class="key-btn" data-num="0">0</button>
-        <button class="key-btn primary" data-action="enter">Enter</button>
-      </div>
+  });
+</script>
 
-      <p id="loginError" class="muted small"></p>
-
-      <button id="backToProfiles" class="btn ghost full" style="margin-top:.8rem;">⬅ Go Back</button>
-    </section>
-
-  </main>
-
-  <script src="script.js"></script>
 </body>
 </html>
