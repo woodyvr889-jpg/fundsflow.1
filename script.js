@@ -36,14 +36,14 @@ const storage = (() => {
 
 /* ---------- USERS ---------- */
 const USERS = [
-  { name: "James",          code: "080512" },
-  { name: "Mum", 1111},
-  { name: "Dad", 1111},
-  { name: "Nannan", 1111},
-  { name: "Grandad Darren", 1111},
-  { name: "Grandma Jean", 1111},
-  { name: "Grandad Steve", 1111},
-  { name: "Uncle Paul", 1111}
+  { name: "James", code: "080512" },
+  { name: "Mum", code: "1111" },
+  { name: "Dad", code: "1111" },
+  { name: "Nanna", code: "1111" },
+  { name: "Grandad Darren", code: "1111" },
+  { name: "Grandma Jean", code: "1111" },
+  { name: "Grandad Steve", code: "1111" },
+  { name: "Uncle Paul", code: "1111" }
 ];
 
 /* ---------- ADMIN CODES (ONLY HERE) ---------- */
